@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Griyo Dhahar Kaca5 Order</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
+body{
+  background: radial-gradient(circle at 20% 20%, #1f2937 0%, transparent 40%),
+              radial-gradient(circle at 80% 80%, #111827 0%, transparent 40%), #0b0b0f;
+  color:#fff;padding:20px;
+}
+.container{max-width:1000px;margin:auto;}
+.header{text-align:center;margin-bottom:28px;}
+.title{font-size:32px;font-weight:700;background:linear-gradient(135deg,#fbbf24,#f59e0b);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.subtitle{color:#9ca3af;font-size:14px;margin-top:4px;}
+.card{background:rgba(255,255,255,0.04);backdrop-filter:blur(14px);
+border:1px solid rgba(255,255,255,.08);padding:26px;border-radius:22px;margin-bottom:22px;}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:14px;}
+label,input,select{width:100%;}
+input,select{padding:12px 14px;margin-top:6px;margin-bottom:14px;border-radius:12px;
+border:1px solid rgba(255,255,255,.08);background:#111318;color:#fff;}
+
+.btn{
+  padding:13px 22px;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:600;
+  transition:all .25s ease;
+}
+.btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
+}
+
+.primary{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;}
+.outline{background:transparent;border:1px solid rgba(255,255,255,.25);color:#fff;}
+
+table{width:100%;border-collapse:collapse;margin-top:16px;}
+th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.08);}
+.total{font-size:24px;color:#fbbf24;font-weight:700;margin-top:18px;}
+
+.badge{
+  display:inline-block;padding:6px 12px;border-radius:999px;font-size:12px;
+  font-weight:600;margin-left:10px;background:rgba(251,191,36,.15);
+  color:#fbbf24;border:1px solid rgba(251,191,36,.35);
+}
+
+.slide-hide{max-height:0;overflow:hidden;opacity:0;transform:translateY(-8px);transition:all .35s ease;}
+.slide-show{max-height:200px;opacity:1;transform:translateY(0);transition:all .35s ease;}
+
+.action-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.action-right{margin-left:auto;}
+
+@media(max-width:768px){
+  .grid-2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="header">
+<h1 class="title">🍽️ Griyo Dhahar Kaca5</h1>
+<div class="subtitle">Sistem Order Digital PRO</div>
+</div>
+
+<!-- DATA CUSTOMER -->
+<div class="card">
+<h3>Data Customer</h3>
+
+<div class="grid-2">
+<label>Nama</label>
+<input id="nama" oninput="validasiNama(this)">
+
+<label>Jumlah Orang</label>
+<input type="number" id="orang">
+</div>
+
+<label>
+Tipe Belanja
+<span id="badgeTipe" class="badge" style="display:none"></span>
+</label>
+<select id="tipeBelanja" onchange="toggleMeja()">
+<option value="">-- Pilih Tipe --</option>
+<option value="Dine-in">Dine-in</option>
+<option value="Dine-in Puasa">Dine-in (Puasa)</option>
+<option value="Take-away">Take-away</option>
+</select>
+
+<div id="wrapMeja" class="slide-show">
+<label>Meja</label>
+<select id="posisi">
+<option value="">-- Pilih Meja --</option>
+<option>Gazebo 1</option>
+<option>Gazebo 2</option>
+<option>Gazebo 3</option>
+<option>Gazebo 4</option>
+<option>Meja 5</option>
+<option>Meja 6</option>
+<option>Meja 7</option>
+<option>Meja 8</option>
+<option>Meja 9</option>
+<option>Meja 10</option>
+</select>
+</div>
+
+<label>Down Payment (DP)</label>
+<input type="number" id="dp">
+
+<div class="grid-2">
+<label>Tanggal</label>
+<input id="tanggal">
+<label>Jam</label>
+<input id="jam">
+</div>
+
+<label>WhatsApp Customer</label>
+<input type="tel" id="waCustomer">
+</div>
+
+<!-- PESANAN -->
+<div class="card">
+<h3>Tambah Pesanan</h3>
+
+<div class="grid-2">
+<label>Menu Kategori</label>
+<select id="kategori" onchange="filterMenu()">
+<option value="">-- Pilih Type --</option>
+<option value="paket">Paket</option>
+<option value="makanan">Makanan</option>
+<option value="minuman">Minuman</option>
+<option value="snacks">Snacks</option>
+<option value="sayur">Sayur</option>
+<option value="tambahan">Tambahan</option>
+</select>
+
+<label>Menu</label>
+<select id="menu">
+<option value="">-- Pilih Menu --</option>
+</select>
+
+<label>Jumlah Orderan</label>
+<input type="number" id="qty">
+</div>
+
+<button class="btn primary" onclick="tambah()">Tambah</button>
+<button class="btn outline" onclick="resetOrder()">Reset</button>
+
+<table id="tabel">
+<thead>
+<tr><th>Menu</th><th>Qty</th><th>Subtotal</th><th>Hapus</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<div class="total">Total: Rp <span id="total">0</span></div>
+<br>
+
+<div class="action-row">
+  <button class="btn primary" onclick="kirimWA()">📲 Kirim ke WhatsApp Restoran</button>
+  <button class="btn outline action-right" onclick="resetOrder()">🔄 Reset Order</button>
+</div>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+flatpickr("#tanggal",{dateFormat:"d-m-Y",minDate:"today"});
+flatpickr("#jam",{enableTime:true,noCalendar:true,dateFormat:"H:i",time_24hr:true});
+
+const menuDB={
+paket:[{nama:"Pahe Griyo",harga:12000}],
+makanan:[{nama:"Ayam Bakar (Dada)",harga:30000}],
+minuman:[{nama:"Coffee (Hot)",harga:6000}],
+snacks:[{nama:"Burger (Manis)",harga:18000}],
+sayur:[{nama:"Cah Jamur",harga:8000}],
+tambahan:[{nama:"Nasi Putih",harga:5000}]
+};
+
+let orders=[],total=0;
+const totalEl=document.getElementById("total");
+
+function toggleMeja(){
+  const tipe=tipeBelanja.value;
+  const meja=posisi;
+  const wrap=wrapMeja;
+  const badge=badgeTipe;
+
+  if(tipe==="Take-away"){
+    meja.disabled=true;
+    meja.selectedIndex=0;
+    wrap.classList.replace("slide-show","slide-hide");
+    orang.value=1;
+    badge.style.display="inline-block";
+    badge.textContent="TAKE-AWAY 🥡";
+  } else if(tipe==="Dine-in Puasa"){
+    meja.disabled=true;
+    meja.selectedIndex=0;
+    wrap.classList.replace("slide-show","slide-hide");
+    badge.style.display="inline-block";
+    badge.textContent="DINE-IN PUASA 🌙";
+  } else if(tipe==="Dine-in"){
+    meja.disabled=false;
+    wrap.classList.replace("slide-hide","slide-show");
+    badge.style.display="inline-block";
+    badge.textContent="DINE-IN 🍽️";
+  } else{
+    badge.style.display="none";
+  }
+}
+
+function filterMenu(){
+  menu.innerHTML='<option value="">-- Pilih Menu --</option>';
+  const k=kategori.value;
+  if(!menuDB[k]) return;
+  menuDB[k].forEach(m=>{
+    const o=document.createElement("option");
+    o.value=`${m.nama}|${m.harga}`;
+    o.textContent=m.nama;
+    menu.appendChild(o);
+  });
+}
+
+function tambah(){
+  const val=menu.value;
+  const qtyVal=parseInt(qty.value);
+  if(!val||!qtyVal) return alert("Lengkapi pesanan!");
+  const [nama,h]=val.split("|");
+  const harga=parseInt(h);
+  orders.push({nama,qty:qtyVal,subtotal:harga*qtyVal});
+  total=orders.reduce((s,o)=>s+o.subtotal,0);
+  render();
+  qty.value="";
+}
+
+function render(){
+  const tb=document.querySelector("#tabel tbody");
+  tb.innerHTML="";
+  orders.forEach((o,i)=>{
+    tb.innerHTML+=`<tr>
+      <td>${o.nama}</td>
+      <td>${o.qty}</td>
+      <td>Rp ${rupiah(o.subtotal)}</td>
+      <td><button class="btn outline" onclick="hapusItem(${i})">❌</button></td>
+    </tr>`;
+  });
+  totalEl.textContent=rupiah(total);
+}
+
+function hapusItem(i){
+  orders.splice(i,1);
+  total=orders.reduce((s,o)=>s+o.subtotal,0);
+  render();
+}
+
+function kirimWA(){
+  const tipe=tipeBelanja.value;
+  if(!nama.value||!orang.value||!tipe||orders.length===0)
+    return alert("Data belum lengkap!");
+
+  if(tipe==="Dine-in" && !posisi.value)
+    return alert("Pilih meja!");
+
+  if(!confirm("Apakah kamu yakin dengan orderanmu?")) return;
+
+  let text=`Griyo Dhahar Kaca5 Orders%0A`;
+  text+=`Nama: ${nama.value}%0A`;
+  text+=`Jumlah Orang: ${orang.value}%0A`;
+  text+=`Tipe: ${tipe}%0A`;
+  text+=`Meja: ${posisi.value||"-"}%0A`;
+  text+=`MENU:%0A`;
+  orders.forEach(o=>text+=`- ${o.nama} x${o.qty}%0A`);
+  text+=`%0ATotal: Rp ${rupiah(total)}`;
+
+  window.open(`https://wa.me/6282116677330?text=${text}`,"_blank");
+}
+
+function resetOrder(){location.reload();}
+function validasiNama(el){el.value=el.value.replace(/[^a-zA-Z\s]/g,"");}
+function rupiah(n){return n.toLocaleString("id-ID");}
+
+toggleMeja();
+</script>
+</body>
+</html>
