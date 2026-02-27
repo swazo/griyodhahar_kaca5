@@ -220,6 +220,28 @@ th,td{
   text-align:center !important;
 }
 
+@media(max-width:480px){
+  .action-row{
+    flex-direction: column;
+    gap:10px;
+    align-items: stretch; /* biar tombol full width */
+  }
+  .action-row .btn{
+    width:100%;  /* tombol full lebar container */
+    font-size:16px; /* bisa sedikit lebih besar biar gampang diklik */
+  }
+  .action-right{
+    margin-left:0; /* hilangkan margin kiri di mobile */
+  }
+}
+
+@media(max-width:480px){
+  .tambah-row .btn{
+    width:100%;
+    font-size:16px;
+  }
+}
+
 
 </style>
 </head>
