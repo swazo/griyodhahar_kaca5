@@ -35,6 +35,21 @@ body{
     0 0 18px rgba(200,169,126,0.35);
 }
 
+.error-field{
+  border-color:#ef4444 !important;
+  box-shadow:0 0 0 3px rgba(239,68,68,.18);
+  animation:shake .25s linear 2;
+}
+
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-3px)}
+  50%{transform:translateX(3px)}
+  75%{transform:translateX(-3px)}
+  100%{transform:translateX(0)}
+}
+
+
 .card{
   background:rgba(255,255,255,0.96);
   border:1px solid rgba(200,169,126,0.45);
@@ -58,6 +73,26 @@ body{
   background:linear-gradient(90deg,#c8a97e,#e6cfa3,#c8a97e);
   border-top-left-radius:22px;
   border-top-right-radius:22px;
+}
+
+.subtitle{
+  text-align:center;
+  margin-top:6px;
+  font-size:15px;
+  color:#8b6a3e;
+  font-weight:500;
+  letter-spacing:.4px;
+  position:relative;
+  display:inline-block;
+}
+
+.subtitle::after{
+  content:"";
+  display:block;
+  width:60%;
+  height:2px;
+  margin:6px auto 0;
+  background:linear-gradient(90deg,#c8a97e,transparent);
 }
 
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:14px;}
@@ -193,6 +228,7 @@ th,td{
 <div class="container">
 <div class="header">
 <h1 class="title">🍽️ Griyo Dhahar Kaca5</h1>
+<div class="subtitle">Sistem Pemesanan Restoran</div>
 </div>
 
 <!-- DATA CUSTOMER -->
@@ -208,7 +244,7 @@ th,td{
 </div>
 
 <label>
-Tipe Belanja
+Tipe Orderan
 <span id="badgeTipe" class="badge" style="display:none"></span>
 </label>
 <select id="tipeBelanja" onchange="toggleMeja()">
@@ -232,17 +268,17 @@ Tipe Belanja
 <option>Meja 8</option>
 <option>Meja 9</option>
 <option>Meja 10</option>
-	<option>Meja 11</option>
-	<option>Meja 12</option>
-	<option>Meja 13</option>
-	<option>Meja 14</option>
-	<option>Meja 15</option>
-	<option>Meja 16</option>
-	<option>Meja 17</option>
-	<option>Meja 18</option>
-	<option>Meja 19</option>
-	<option>Meja 20</option>
-	<option>Meja 21</option>
+<option>Meja 11</option>
+<option>Meja 12</option>
+<option>Meja 13</option>
+<option>Meja 14</option>
+<option>Meja 15</option>
+<option>Meja 16</option>
+<option>Meja 17</option>
+<option>Meja 18</option>
+<option>Meja 19</option>
+<option>Meja 20</option>
+<option>Meja 21</option>
 </select>
 </div>
 
@@ -262,10 +298,10 @@ Tipe Belanja
 
 <!-- PESANAN -->
 <div class="card">
-<h3>Tambah Pesanan</h3>
+<h3>Pesanan</h3>
 
 <div class="grid-2">
-<label>Menu Kategori</label>
+<label>Kategori</label>
 <select id="kategori" onchange="filterMenu()">
 <option value="">-- Pilih Type --</option>
 <option value="paket">Paket</option>
@@ -476,6 +512,16 @@ tambahan:[
 ]
 };
 
+function fokusError(el){
+  el.classList.add("error-field");
+  el.focus();
+  el.scrollIntoView({behavior:"smooth", block:"center"});
+  
+  setTimeout(()=>{
+    el.classList.remove("error-field");
+  },1500);
+}
+
 let orders=[],total=0;
 const totalEl=document.getElementById("total");
 
@@ -521,15 +567,38 @@ function filterMenu(){
 }
 
 function tambah(){
+  if(!kategori.value){
+    alert("Kategori wajib diisi!");
+    return fokusError(kategori);
+  }
+
+  if(!menu.value){
+    alert("Menu wajib diisi!");
+    return fokusError(menu);
+  }
+
+  if(!qty.value || qty.value <= 0){
+    alert("Jumlah orderan wajib diisi!");
+    return fokusError(qty); // <-- ini akan shake + border merah
+  }
+
   const val=menu.value;
   const qtyVal=parseInt(qty.value);
-  if(!val||!qtyVal) return alert("Lengkapi pesanan!");
   const [nama,h]=val.split("|");
   const harga=parseInt(h);
+
   orders.push({nama,qty:qtyVal,subtotal:harga*qtyVal});
   total=orders.reduce((s,o)=>s+o.subtotal,0);
   render();
+
+  // reset form
+  kategori.value="";
+  menu.innerHTML='<option value="">-- Pilih Menu --</option>';
+  menu.value="";
   qty.value="";
+
+  // fokus balik ke kategori
+  kategori.focus();
 }
 
 function render(){
@@ -554,27 +623,88 @@ function hapusItem(i){
 
 function kirimWA(){
   const tipe=tipeBelanja.value;
-  if(!nama.value||!orang.value||!tipe||orders.length===0)
-    return alert("Data belum lengkap!");
 
-  if(tipe==="Dine-in" && !posisi.value)
-    return alert("Pilih meja!");
+  // ===== VALIDASI WAJIB =====
+  if(!nama.value){
+    alert("Nama belum diisi!");
+    return fokusError(nama);
+  }
+
+  if(!orang.value){
+    alert("Jumlah orang belum diisi!");
+    return fokusError(orang);
+  }
+
+  if(!tipe){
+    alert("Pilih Tipe Orderan!");
+    return fokusError(tipeBelanja);
+  }
+
+  if(tipe==="Dine-in" && !posisi.value){
+    alert("Pilih Meja!");
+    return fokusError(posisi);
+  }
+
+  // ✅ VALIDASI BARU (YANG KAMU MINTA)
+  if(!dp.value || dp.value <= 0){
+    alert("Down Payment wajib diisi!");
+    return fokusError(dp);
+  }
+
+  if(!tanggal.value){
+    alert("Tanggal wajib diisi!");
+    return fokusError(tanggal);
+  }
+
+  if(!jam.value){
+    alert("Jam wajib diisi!");
+    return fokusError(jam);
+  }
+
+  if(!waCustomer.value){
+    alert("WhatsApp customer wajib diisi!");
+    return fokusError(waCustomer);
+  }
+
+  if(orders.length===0){
+    alert("Belum ada pesanan!");
+    return;
+  }
 
   if(!confirm("Apakah kamu yakin dengan orderanmu?")) return;
 
-  let text=`Griyo Dhahar Kaca5 Orders%0A`;
-  text+=`Nama: ${nama.value}%0A`;
-  text+=`Jumlah Orang: ${orang.value}%0A`;
-  text+=`Tipe: ${tipe}%0A`;
-  text+=`Meja: ${posisi.value||"-"}%0A`;
-  text+=`MENU:%0A`;
-  orders.forEach(o=>text+=`- ${o.nama} x${o.qty}%0A`);
-  text+=`%0ATotal: Rp ${rupiah(total)}`;
+  // ===== FORMAT PESAN =====
+  let teks=`*ORDER BARU*%0A`;
+  teks+=`Nama: ${nama.value}%0A`;
+  teks+=`Jumlah Orang: ${orang.value}%0A`;
+  teks+=`Tipe: ${tipe}%0A`;
+  teks+=`DP: Rp ${rupiah(parseInt(dp.value))}%0A`;
+  teks+=`Tanggal: ${tanggal.value}%0A`;
+  teks+=`Jam: ${jam.value}%0A`;
+  teks+=`WA Customer: ${waCustomer.value}%0A`;
 
-  window.open(`https://wa.me/6282116677330?text=${text}`,"_blank");
+  if(tipe==="Dine-in"){
+    teks+=`Meja: ${posisi.value}%0A`;
+  }
+
+  teks+=`%0A*Pesanan:*%0A`;
+
+  orders.forEach(o=>{
+    teks+=`- ${o.nama} x${o.qty} = Rp ${rupiah(o.subtotal)}%0A`;
+  });
+
+  teks+=`%0ATotal: Rp ${rupiah(total)}`;
+
+  const noWA="6282116677330"; // ganti jika perlu
+  window.open(`https://wa.me/${noWA}?text=${teks}`,"_blank");
 }
-
-function resetOrder(){location.reload();}
+function resetOrder(){
+  if(confirm("Apakah yakin kamu akan menghapus seluruh orderan?")){
+    location.reload(); // jika OK, halaman reload / reset semua
+  } else {
+    return; // jika cancel, tidak terjadi apa-apa
+  }
+}
 function validasiNama(el){el.value=el.value.replace(/[^a-zA-Z\s]/g,"");}
 function rupiah(n){return n.toLocaleString("id-ID");}
 
