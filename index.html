@@ -242,6 +242,41 @@ th,td{
   }
 }
 
+/* ===== QTY INLINE TABLE ===== */
+.qty-inline{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:#f3ede4;
+  border-radius:999px;
+  padding:4px 8px;
+  width:fit-content;
+  margin:auto;
+}
+
+.qty-mini{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:none;
+  background:#fff;
+  font-weight:700;
+  cursor:pointer;
+  transition:.15s;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+
+.qty-mini:hover{
+  background:#e9dcc7;
+  transform:scale(1.1);
+}
+
+.qty-number{
+  min-width:18px;
+  font-weight:600;
+}
+
 
 </style>
 </head>
@@ -271,9 +306,9 @@ Tipe Orderan
 </label>
 <select id="tipeBelanja" onchange="toggleMeja()">
 <option value="">-- Pilih Tipe --</option>
-<option value="Dine-in">Dine-in</option>
+<!-- <option value="Dine-in">Dine-in</option> --!>
 <option value="Dine-in Puasa">Dine-in (Puasa)</option>
-<option value="Take-away">Take-away</option>
+<!-- <option value="Take-away">Take-away</option> --!>
 </select>
 
 <div id="wrapMeja" class="slide-show">
@@ -608,7 +643,12 @@ function tambah(){
   const [nama,h]=val.split("|");
   const harga=parseInt(h);
 
-  orders.push({nama,qty:qtyVal,subtotal:harga*qtyVal});
+ orders.push({
+  nama,
+  qty: qtyVal,
+  harga: harga,
+  subtotal: harga * qtyVal
+});
   total=orders.reduce((s,o)=>s+o.subtotal,0);
   render();
 
@@ -625,14 +665,28 @@ function tambah(){
 function render(){
   const tb=document.querySelector("#tabel tbody");
   tb.innerHTML="";
+
   orders.forEach((o,i)=>{
-    tb.innerHTML+=`<tr>
+    tb.innerHTML+=`
+    <tr>
       <td>${o.nama}</td>
-      <td>${o.qty}</td>
+
+      <td>
+        <div class="qty-inline">
+          <button class="qty-mini" onclick="editQty(${i}, -1)">−</button>
+          <span class="qty-number">${o.qty}</span>
+          <button class="qty-mini" onclick="editQty(${i}, 1)">+</button>
+        </div>
+      </td>
+
       <td>Rp ${rupiah(o.subtotal)}</td>
-      <td><button class="btn outline" onclick="hapusItem(${i})">❌</button></td>
+
+      <td>
+        <button class="btn outline" onclick="hapusItem(${i})">❌</button>
+      </td>
     </tr>`;
   });
+
   totalEl.textContent=rupiah(total);
 }
 
@@ -730,15 +784,18 @@ function validasiNama(el){el.value=el.value.replace(/[^a-zA-Z\s]/g,"");}
 function rupiah(n){return n.toLocaleString("id-ID");}
 
 toggleMeja();
+
+function editQty(index, arah){
+  let item = orders[index];
+
+  item.qty += arah;
+  if(item.qty < 1) item.qty = 1;
+
+  item.subtotal = item.harga * item.qty;
+
+  total = orders.reduce((s,o)=>s+o.subtotal,0);
+  render();
+}
 </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-
