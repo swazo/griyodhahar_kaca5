@@ -774,14 +774,18 @@ function kirimWA(){
   window.open(`https://wa.me/${noWA}?text=${teks}`,"_blank");
   setTimeout(()=>{
   resetOrder();
-}, 500);
+}, 600);
 }
 function resetOrder(){
-  if(confirm("Apakah yakin kamu akan menghapus seluruh orderan?")){
-    location.reload(); // jika OK, halaman reload / reset semua
-  } else {
-    return; // jika cancel, tidak terjadi apa-apa
-  }
+  orders = [];
+  total = 0;
+  render();
+
+  // reset semua input
+  document.querySelectorAll("input").forEach(el => el.value = "");
+  document.querySelectorAll("select").forEach(el => el.selectedIndex = 0);
+
+  toggleMeja();
 }
 function validasiNama(el){el.value=el.value.replace(/[^a-zA-Z\s]/g,"");}
 function rupiah(n){return n.toLocaleString("id-ID");}
