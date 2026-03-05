@@ -772,6 +772,9 @@ function kirimWA(){
 
   const noWA="6282116677330"; // ganti jika perlu
   window.open(`https://wa.me/${noWA}?text=${teks}`,"_blank");
+  setTimeout(()=>{
+  resetOrder();
+}, 500);
 }
 function resetOrder(){
   if(confirm("Apakah yakin kamu akan menghapus seluruh orderan?")){
@@ -798,4 +801,14 @@ function editQty(index, arah){
 }
 </script>
 </body>
+
 </html>
+
+
+
+
+
+
+
+
+
