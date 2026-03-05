@@ -392,6 +392,36 @@ Tipe Orderan
 <div class="total">Total: Rp <span id="total">0</span></div>
 <br>
 
+<!-- ✅ TARUH DI SINI -->
+<div class="card" style="margin-top:18px;">
+  <h3>Ringkasan Pembayaran</h3>
+
+  <table id="summaryTable">
+    <tbody>
+      <tr>
+        <td>Total Item</td>
+        <td id="sumItem">0</td>
+      </tr>
+      <tr>
+        <td>Total Qty</td>
+        <td id="sumQty">0</td>
+      </tr>
+      <tr>
+        <td>Total Belanja</td>
+        <td>Rp <span id="sumTotal">0</span></td>
+      </tr>
+      <tr>
+        <td>DP</td>
+        <td>Rp <span id="sumDP">0</span></td>
+      </tr>
+      <tr style="font-weight:700;color:#b89663;">
+        <td>Sisa Bayar</td>
+        <td>Rp <span id="sumSisa">0</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 <div class="action-row">
   <button class="btn primary" onclick="kirimWA()">📲 Kirim ke WhatsApp Restoran</button>
   <button class="btn outline action-right" onclick="resetOrder()">🔄 Reset Order</button>
@@ -688,6 +718,21 @@ function render(){
   });
 
   totalEl.textContent=rupiah(total);
+  updateSummary();
+}
+
+function updateSummary(){
+  const totalItem = orders.length;
+  const totalQty = orders.reduce((s,o)=>s+o.qty,0);
+  const totalBelanja = total;
+  const dpVal = parseInt(dp.value) || 0;
+  const sisa = totalBelanja - dpVal;
+
+  document.getElementById("sumItem").textContent = totalItem;
+  document.getElementById("sumQty").textContent = totalQty;
+  document.getElementById("sumTotal").textContent = rupiah(totalBelanja);
+  document.getElementById("sumDP").textContent = rupiah(dpVal);
+  document.getElementById("sumSisa").textContent = rupiah(Math.max(sisa,0));
 }
 
 function hapusItem(i){
@@ -768,7 +813,26 @@ function kirimWA(){
     teks+=`- ${o.nama} x${o.qty} = Rp ${rupiah(o.subtotal)}%0A`;
   });
 
-  teks+=`%0ATotal: Rp ${rupiah(total)}`;
+  // ===== RINGKASAN =====
+const totalItem = orders.length;
+const totalQty = orders.reduce((s,o)=>s+o.qty,0);
+const dpVal = parseInt(dp.value) || 0;
+const sisa = total - dpVal;
+
+teks+=`%0A*Ringkasan Pembayaran*%0A`;
+teks+=`Total Item: ${totalItem}%0A`;
+teks+=`Total Qty: ${totalQty}%0A`;
+teks+=`Total Belanja: Rp ${rupiah(total)}%0A`;
+teks+=`DP: Rp ${rupiah(dpVal)}%0A`;
+teks+=`Sisa Bayar: Rp ${rupiah(Math.max(sisa,0))}`;
+
+
+teks+=`%0A%0A*Transfer Pembayaran*%0A`;
+teks+=`Bank Mandiri - 148-002465-6756 a.n Bayu S.%0A`;
+teks+=`Bank BRI - 0333-0102-2206-536 a.n Bayu S.%0A`;
+teks+=`Bank BNI - 1575-0614-49 a.n Bayu S.%0A`;
+teks+=`%0ASetelah transfer mohon kirim bukti yaa`;
+
 
   const noWA="6282116677330"; // ganti jika perlu
   window.open(`https://wa.me/${noWA}?text=${teks}`,"_blank");
@@ -791,6 +855,7 @@ function validasiNama(el){el.value=el.value.replace(/[^a-zA-Z\s]/g,"");}
 function rupiah(n){return n.toLocaleString("id-ID");}
 
 toggleMeja();
+dp.addEventListener("input", updateSummary);
 
 function editQty(index, arah){
   let item = orders[index];
@@ -807,12 +872,3 @@ function editQty(index, arah){
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
