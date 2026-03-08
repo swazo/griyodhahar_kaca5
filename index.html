@@ -425,6 +425,15 @@ border-radius:8px;
 margin-top:8px;
 }
 
+#menuPlaceholder{
+  width:100%;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  background:#f8f8f8;
+  color:#666;
+}
+
 </style>
 </head>
 <body>
@@ -533,9 +542,13 @@ Tipe Orderan
 
 <div>
 <label>Menu</label>
-<div id="menuList" class="menu-list">
-Pilih kategori dulu
-</div>
+<input 
+  type="text" 
+  id="menuPlaceholder" 
+  value="-- Pilih kategori dulu --" 
+  readonly
+>
+<div id="menuList"></div>
 </div>
 
 </div>
@@ -834,6 +847,15 @@ function filterMenu(){
     `;
 
   });
+  
+  const placeholder = document.getElementById("menuPlaceholder");
+
+if(!menuDB[k]){
+  placeholder.style.display = "block";
+  return;
+}
+
+placeholder.style.display = "none";
 
 }
 
