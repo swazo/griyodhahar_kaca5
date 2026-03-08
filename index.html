@@ -147,7 +147,6 @@ input:focus,select:focus{
   background:#f3ede4;
 }
 
-table{width:100%;border-collapse:collapse;margin-top:16px;}
 th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.08);}
 .total{
   font-size:26px;
@@ -284,21 +283,10 @@ th,td{
   background:#f3ede4;
 }
 
-#tabel{
-  width:100%;
-}
-
 /* Desktop tetap rapi */
 @media(min-width:481px){
   #tabel{
     table-layout: fixed;
-  }
-
-  #tabel th,
-  #tabel td{
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
   }
 }
 
@@ -387,10 +375,6 @@ th,td{
   #tabel td:nth-child(4){ width:20%; text-align:right; }
 }
 
-.qty-menu button:hover{
-  background:#e9dcc7;
-}
-
 .menu-list{
   border:1px solid #ddd;
   border-radius:10px;
@@ -431,6 +415,14 @@ th,td{
   0%{transform:scale(1);}
   50%{transform:scale(1.01);}
   100%{transform:scale(1);}
+}
+
+#searchMenu{
+width:100%;
+padding:10px;
+border:1px solid #ddd;
+border-radius:8px;
+margin-top:8px;
 }
 
 </style>
@@ -525,7 +517,19 @@ Tipe Orderan
 <option value="sayur">Sayur</option>
 <option value="tambahan">Tambahan</option>
 </select>
+
+<div id="searchBox" style="display:none;">
+  <label>Cari Menu</label>
+  <input 
+    type="text" 
+    id="searchMenu" 
+    placeholder="Ketik nama menu..."
+    onkeyup="searchMenu()"
+  >
 </div>
+</div>
+
+
 
 <div>
 <label>Menu</label>
@@ -679,8 +683,8 @@ minuman:[
 	{nama:"Float Vanilla", harga:	 20000}, 
 	{nama:"Hot Ginger", harga:	 8000}, 
 	{nama:"Hot Milky Ginger", harga:	 12000}, 
-	{nama:"Orange (Iced)", harga:	 6000}, 
-	{nama:"Orange (Hot)", harga:	 6000}, 
+	{nama:"Jeruk (Iced)", harga:	 6000}, 
+	{nama:"Jeruk (Hot)", harga:	 6000}, 
 	{nama:"Juice Alpokat", harga:	 20000}, 
 	{nama:"Juice Jeruk", harga:	 15000}, 
 	{nama:"Juice Mangga", harga:	 20000}, 
@@ -806,12 +810,19 @@ function filterMenu(){
   const list = document.getElementById("menuList");
   const k = kategori.value;
 
+  const searchBox = document.getElementById("searchBox");
+
   list.innerHTML = "";
 
   if(!menuDB[k]){
     list.innerHTML = "Pilih kategori dulu";
+    searchBox.style.display = "none";
     return;
   }
+
+  // tampilkan search jika kategori dipilih
+  searchBox.style.display = "block";
+  document.getElementById("searchMenu").focus();
 
   menuDB[k].forEach(m=>{
 
@@ -868,52 +879,16 @@ function tambahMenu(nama,harga){
 
 }
 
-function tambah(){
-  if(!kategori.value){
-    alert("Kategori wajib diisi!");
-    return fokusError(kategori);
-  }
-
-  if(!menu.value){
-    alert("Menu wajib diisi!");
-    return fokusError(menu);
-  }
-
-  const val = menu.value;
-  const qtyVal = qtySelected;
-  const [nama,h] = val.split("|");
-  const harga = parseInt(h);
-
-  orders.push({
-    nama,
-    qty: qtyVal,
-    harga: harga,
-    subtotal: harga * qtyVal
-  });
-
-  total = orders.reduce((s,o)=>s+o.subtotal,0);
-  render();
-
-  // reset form
-  kategori.value="";
-  menu.innerHTML='<option value="">-- Pilih Menu --</option>';
-  menu.value="";
-
-  // reset qty
-  qtySelected = 1;
-  document.getElementById("qtyValue").textContent = 1;
-
-  kategori.focus();
-}
-
 function render(){
   const tb=document.querySelector("#tabel tbody");
   tb.innerHTML="";
 
-  orders.forEach((o,i)=>{
-    tb.innerHTML+=`
-    <tr>
-      <td>${o.nama}</td>
+let html="";
+
+orders.forEach((o,i)=>{
+  html+=`
+  <tr>
+    <td>${o.nama}</td>
 
 <td>
   <div class="qty-inline">
@@ -923,13 +898,15 @@ function render(){
   </div>
 </td>
 
-      <td>Rp ${rupiah(o.subtotal)}</td>
+    <td>Rp ${rupiah(o.subtotal)}</td>
 
-      <td>
-        <button class="btn outline" onclick="hapusItem(${i})">❌</button>
-      </td>
-    </tr>`;
-  });
+    <td>
+      <button class="btn outline" onclick="hapusItem(${i})">❌</button>
+    </td>
+  </tr>`;
+});
+
+tb.innerHTML = html;
 
   totalEl.textContent=rupiah(total);
   updateSummary();
@@ -1087,51 +1064,30 @@ function editQty(index, change){
   render();
 }
 
-function toggleQtyEdit(index){
+function searchMenu(){
 
-  const edit = document.getElementById("qtyEdit"+index);
+  const keyword = document
+  .getElementById("searchMenu")
+  .value
+  .toLowerCase();
 
-  if(edit.style.display === "none"){
-    edit.style.display = "inline-flex";
-  }else{
-    edit.style.display = "none";
-  }
+  const menuItems = document
+  .querySelectorAll("#menuList .menu-item");
+
+  menuItems.forEach(item=>{
+
+    const text = item.textContent.toLowerCase();
+
+    if(text.includes(keyword)){
+      item.style.display="block";
+    }else{
+      item.style.display="none";
+    }
+
+  });
 
 }
-
-function pilihMenu(){
-
-  const val = menu.value;
-  if(!val) return;
-
-  const [nama,h] = val.split("|");
-  const harga = parseInt(h);
-
-  // cek apakah menu sudah ada
-  let existing = orders.find(o => o.nama === nama);
-
-  if(existing){
-    existing.qty += 1;
-    existing.subtotal = existing.qty * existing.harga;
-  }else{
-    orders.push({
-      nama:nama,
-      qty:1,
-      harga:harga,
-      subtotal:harga
-    });
-  }
-
-  total = orders.reduce((s,o)=>s+o.subtotal,0);
-  render();
-
-  // reset dropdown
-  menu.value="";
-}
-
 
 </script>
 </body>
-
 </html>
-
